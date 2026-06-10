@@ -184,6 +184,10 @@ select, option{font-family:'Inter',sans-serif;}
 .top-cortes-list th,.top-cortes-list td{padding:9px 10px;border-bottom:1px solid #eef2f0;text-align:left;font-size:12px;}
 .top-cortes-list th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:#f9fafb;}
 @media(max-width:900px){.bi-grid{grid-template-columns:1fr!important}.performance-row{grid-template-columns:38px 1fr 56px}.category-mini{grid-template-columns:1fr}.top-cortes-list{min-width:640px}}
+
+.executive-summary{display:grid;gap:10px;font-size:13px;color:#374151;line-height:1.55;}
+.executive-summary p{background:#f9fafb;border:1px solid #eef2f0;border-radius:12px;padding:12px 14px;}
+@media(max-width:900px){.bi-card .bi-value{font-size:20px}.top-cortes-list{min-width:760px}}
 </style>
 </head>
 <body>
@@ -380,21 +384,38 @@ select, option{font-family:'Inter',sans-serif;}
       <div class="page" id="page-diferenciais">
         <div class="page-header">
           <h2>Performance BI</h2>
-          <p>Indicadores inteligentes, alertas e ranking por categoria para decisão rápida</p>
+          <p>Análise executiva com base nos dados fornecidos — período: 01 a 31 de maio de 2026</p>
         </div>
 
-        <div class="bi-grid" id="bi-highlights"></div>
+        <div class="bi-grid" id="bi-highlights">
+          <div class="bi-card"><div class="bi-label">Faturamento Total</div><div class="bi-value">R$ 751.000</div><div class="bi-sub">Volume geral consolidado no período.</div></div>
+          <div class="bi-card"><div class="bi-label">Peso Total</div><div class="bi-value">27.742 kg</div><div class="bi-sub">Total vendido em peso.</div></div>
+          <div class="bi-card"><div class="bi-label">Transações</div><div class="bi-value">20.797</div><div class="bi-sub">Quantidade total de vendas registradas.</div></div>
+          <div class="bi-card"><div class="bi-label">Ticket Médio Geral</div><div class="bi-value">R$ 36,11</div><div class="bi-sub">Faturamento dividido pelas transações.</div></div>
+          <div class="bi-card"><div class="bi-label">Melhor Operador</div><div class="bi-value">Stefani M.</div><div class="bi-sub">R$ 83.375 faturados no mês.</div></div>
+        </div>
 
         <div class="charts-row">
           <div class="chart-card">
-            <div class="chart-title">Índice de Performance</div>
+            <div class="chart-title">Índice de Performance dos Operadores</div>
             <div class="chart-sub">Pontuação de 0 a 100 considerando faturamento, peso, transações e ticket médio</div>
-            <div class="performance-list" id="performance-list"></div>
+            <div class="performance-list" id="performance-list">
+              <div class="performance-row"><div class="score-badge">1</div><div><strong>Stefani M.</strong><div class="score-bar"><div class="score-fill" style="width:98%"></div></div><small style="color:var(--muted)">R$ 83.375 • 3.062 kg • 2.365 transações</small></div><strong>98 pts</strong></div>
+              <div class="performance-row"><div class="score-badge">2</div><div><strong>Cassiano S.</strong><div class="score-bar"><div class="score-fill" style="width:95%"></div></div><small style="color:var(--muted)">R$ 79.981 • 2.877 kg • 2.200 transações</small></div><strong>95 pts</strong></div>
+              <div class="performance-row"><div class="score-badge">3</div><div><strong>Natalia B.</strong><div class="score-bar"><div class="score-fill" style="width:93%"></div></div><small style="color:var(--muted)">R$ 77.665 • 2.860 kg • 2.100 transações</small></div><strong>93 pts</strong></div>
+              <div class="performance-row"><div class="score-badge">4</div><div><strong>Matheus Z.</strong><div class="score-bar"><div class="score-fill" style="width:89%"></div></div><small style="color:var(--muted)">R$ 72.736 • 2.670 kg • 1.901 transações</small></div><strong>89 pts</strong></div>
+              <div class="performance-row"><div class="score-badge">5</div><div><strong>José L.</strong><div class="score-bar"><div class="score-fill" style="width:88%"></div></div><small style="color:var(--muted)">R$ 72.156 • 2.588 kg • 1.939 transações</small></div><strong>88 pts</strong></div>
+            </div>
           </div>
           <div class="chart-card">
             <div class="chart-title">Ranking por Categoria</div>
-            <div class="chart-sub">Destaque por bovino, aves, suíno e outros</div>
-            <div class="category-mini" id="category-rankings"></div>
+            <div class="chart-sub">Destaques por família de produtos</div>
+            <div class="category-mini" id="category-rankings">
+              <div class="category-rank"><h4>🥩 Bovinos</h4><p><strong>Stefani M.</strong></p><p>Maior participação entre cortes bovinos.</p></div>
+              <div class="category-rank"><h4>🍗 Aves</h4><p><strong>Cassiano S.</strong></p><p>Destaque em volume e transações de aves.</p></div>
+              <div class="category-rank"><h4>🐖 Suínos</h4><p><strong>Natalia B.</strong></p><p>Boa participação nos cortes suínos.</p></div>
+              <div class="category-rank"><h4>⭐ Eficiência</h4><p><strong>José L.</strong></p><p>Destaque em aproveitamento R$/kg.</p></div>
+            </div>
           </div>
         </div>
 
@@ -402,12 +423,42 @@ select, option{font-family:'Inter',sans-serif;}
           <div class="chart-card">
             <div class="chart-title">Top 10 Cortes do Mês</div>
             <div class="chart-sub">Cortes com maior faturamento no período</div>
-            <div class="table-wrap"><table class="top-cortes-list" id="top-cortes-bi"></table></div>
+            <div class="table-wrap"><table class="top-cortes-list" id="top-cortes-bi">
+              <thead><tr><th>#</th><th>Corte</th><th>Categoria</th><th>Total R$</th><th>Observação</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td><strong>Acém Bovino</strong></td><td>Bovino</td><td><strong>R$ 61.064</strong></td><td>Corte de maior impacto no faturamento</td></tr>
+                <tr><td>2</td><td><strong>Contra Filé Bovino</strong></td><td>Bovino</td><td><strong>R$ 49.938</strong></td><td>Alto valor agregado</td></tr>
+                <tr><td>3</td><td><strong>Costela Minga Fresca</strong></td><td>Bovino</td><td><strong>R$ 39.570</strong></td><td>Forte saída no período</td></tr>
+                <tr><td>4</td><td><strong>Costela Minga Congelada</strong></td><td>Bovino</td><td><strong>R$ 30.008</strong></td><td>Bom desempenho em volume</td></tr>
+                <tr><td>5</td><td><strong>Costelinha Suína Fresca</strong></td><td>Suíno</td><td><strong>R$ 22.591</strong></td><td>Destaque em suíno</td></tr>
+                <tr><td>6</td><td><strong>Bisteca Suína Fresca</strong></td><td>Suíno</td><td><strong>R$ 20.071</strong></td><td>Alta recorrência de venda</td></tr>
+                <tr><td>7</td><td><strong>Coxa Sobrecoxa Frango</strong></td><td>Aves</td><td><strong>R$ 19.875</strong></td><td>Destaque em aves</td></tr>
+                <tr><td>8</td><td><strong>Alcatra Bovino</strong></td><td>Bovino</td><td><strong>R$ 17.267</strong></td><td>Bom ticket por kg</td></tr>
+                <tr><td>9</td><td><strong>Asa de Frango</strong></td><td>Aves</td><td><strong>R$ 15.533</strong></td><td>Produto de giro</td></tr>
+                <tr><td>10</td><td><strong>Contra Filé Premium</strong></td><td>Bovino</td><td><strong>R$ 14.698</strong></td><td>Produto de maior valor agregado</td></tr>
+              </tbody>
+            </table></div>
           </div>
           <div class="chart-card">
             <div class="chart-title">Alertas Gerenciais</div>
-            <div class="chart-sub">Pontos de atenção calculados automaticamente</div>
-            <div class="alert-list" id="alert-list"></div>
+            <div class="chart-sub">Pontos de atenção calculados para tomada de decisão</div>
+            <div class="alert-list" id="alert-list">
+              <div class="alert-item">🟢 Faturamento total acima de <strong>R$ 750 mil</strong> no período.</div>
+              <div class="alert-item">🟢 Foram registradas <strong>20.797 transações</strong>, com ticket médio geral de <strong>R$ 36,11</strong>.</div>
+              <div class="alert-item">🟡 Os 3 maiores operadores concentram aproximadamente <strong>32%</strong> do faturamento total.</div>
+              <div class="alert-item">🟡 Existe diferença superior a <strong>R$ 69 mil</strong> entre o maior e o menor faturamento.</div>
+              <div class="alert-item">🔴 <strong>Reinando D.</strong> apresenta a menor participação operacional e pode ser acompanhado separadamente.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">Resumo Executivo</div>
+          <div class="chart-sub">Leitura rápida para gerente, supervisor ou diretoria</div>
+          <div class="executive-summary">
+            <p><strong>Resultado geral:</strong> o açougue atingiu aproximadamente <strong>R$ 751 mil</strong> em faturamento, com <strong>27.742 kg</strong> vendidos e <strong>20.797 transações</strong>.</p>
+            <p><strong>Melhor desempenho individual:</strong> Stefani M. lidera em faturamento, seguida por Cassiano S. e Natalia B.</p>
+            <p><strong>Principal oportunidade:</strong> acompanhar operadores abaixo da média e reforçar os cortes de maior giro, principalmente Acém Bovino, Contra Filé e Costela Minga.</p>
           </div>
         </div>
       </div>
