@@ -205,6 +205,21 @@ select, option{font-family:'Inter',sans-serif;}
 .btn-export-pdf{border:none;background:linear-gradient(135deg,#f5a623,#e8941a);color:#fff;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 6px 14px rgba(245,166,35,.22);white-space:nowrap;}
 .btn-export-pdf:hover{opacity:.92;}
 .filter-select{border:1.5px solid var(--border);background:#fff;border-radius:10px;padding:9px 12px;font-size:12px;font-weight:700;color:#1f2937;}
+.corte-filter-bar{align-items:flex-start;gap:14px;}
+.filter-group{display:flex;flex-direction:column;gap:7px;}
+.corte-category-tabs{display:flex;gap:8px;flex-wrap:wrap;}
+.corte-cat-btn{border:1.5px solid var(--border);background:#fff;color:#1f2937;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:.15s;}
+.corte-cat-btn:hover{border-color:#1a7c3e;color:#1a7c3e;}
+.corte-cat-btn.active{background:#1a7c3e;color:#fff;border-color:#1a7c3e;box-shadow:0 6px 14px rgba(26,124,62,.16);}
+#corte-select{min-width:280px;}
+@media(max-width:900px){
+  .corte-filter-bar{display:flex!important;flex-direction:column!important;}
+  .filter-group{width:100%;}
+  .corte-category-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;}
+  .corte-cat-btn{width:100%;padding:11px 10px;font-size:12px;}
+  #corte-select{width:100%;min-width:0;height:46px;font-size:14px;}
+}
+
 .mobile-rank-cards{display:none;gap:10px;flex-direction:column;}
 .mobile-rank-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(0,0,0,.035);}
 .mobile-rank-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;}
@@ -422,9 +437,21 @@ select, option{font-family:'Inter',sans-serif;}
           <p>Qual operador mais vendeu cada tipo de corte bovino, suíno ou frango</p>
         </div>
         <div class="category-grid" id="category-grid"></div>
-        <div class="filter-bar">
-          <label>Filtrar corte:</label>
-          <select id="corte-select" onchange="updateCorteChart()"></select>
+        <div class="filter-bar corte-filter-bar">
+          <div class="filter-group">
+            <label>Filtrar categoria:</label>
+            <div class="corte-category-tabs" id="corte-category-tabs">
+              <button type="button" class="corte-cat-btn active" data-cat="TODOS" onclick="setCorteCategory('TODOS')">Todos</button>
+              <button type="button" class="corte-cat-btn" data-cat="AVES" onclick="setCorteCategory('AVES')">Aves</button>
+              <button type="button" class="corte-cat-btn" data-cat="BOVINO" onclick="setCorteCategory('BOVINO')">Bovinos</button>
+              <button type="button" class="corte-cat-btn" data-cat="SUÍNO" onclick="setCorteCategory('SUÍNO')">Suínos</button>
+              <button type="button" class="corte-cat-btn" data-cat="OUTROS" onclick="setCorteCategory('OUTROS')">Outros</button>
+            </div>
+          </div>
+          <div class="filter-group">
+            <label>Filtrar corte:</label>
+            <select id="corte-select" onchange="updateCorteChart()"></select>
+          </div>
         </div>
         <div class="charts-row three">
           <div class="chart-card">
@@ -753,16 +780,55 @@ function updateOpDetail(){
   });
 }
 
-function buildCortesPage(){
+let corteCategoriaAtual='TODOS';
+
+function normalizaCorteNome(nome){
+  return (nome||'').replace(/\s+kg$/i,'').trim();
+}
+
+function getFilteredCuts(){
+  return [...(DATA.cutSummary||[])]
+    .map(c=>({...c,categoria:getCategoryByCutName(c.nome)}))
+    .filter(c=>corteCategoriaAtual==='TODOS' || c.categoria===corteCategoriaAtual)
+    .sort((a,b)=>normalizaCorteNome(a.nome).localeCompare(normalizaCorteNome(b.nome),'pt-BR',{sensitivity:'base'}));
+}
+
+function setCorteCategory(cat){
+  corteCategoriaAtual=cat||'TODOS';
+  document.querySelectorAll('.corte-cat-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.cat===corteCategoriaAtual);
+  });
+  populateCorteSelect(true);
+  updateCorteChart();
+}
+
+function populateCorteSelect(resetSelection=false){
   const sel=document.getElementById('corte-select');
-  if(sel && !sel.options.length){
-    DATA.cutSummary.forEach(c=>{
-      const opt=document.createElement('option'); opt.value=c.nome; opt.textContent=`${c.nome.replace(' kg','')} — ${c.categoria}`; sel.appendChild(opt);
-    });
+  if(!sel) return;
+  const current=sel.value;
+  const cortes=getFilteredCuts();
+  sel.innerHTML='';
+  cortes.forEach(c=>{
+    const opt=document.createElement('option');
+    opt.value=c.nome;
+    opt.textContent=`${normalizaCorteNome(c.nome)} — ${c.categoria}`;
+    sel.appendChild(opt);
+  });
+  if(!resetSelection && current && cortes.some(c=>c.nome===current)){
+    sel.value=current;
+  }else if(cortes[0]){
+    sel.value=cortes[0].nome;
   }
+}
+
+function buildCortesPage(){
+  populateCorteSelect(false);
   const grid=document.getElementById('category-grid');
   if(grid){
-    grid.innerHTML=DATA.catSummary.map(c=>`<div class="category-card"><strong>${c.categoria}</strong><div class="big">${fmt(c.total_rs)}</div><small>${fmtKg(c.total_kg)} • ${c.transacoes.toLocaleString('pt-BR')} transações • ${c.cortes} cortes</small></div>`).join('');
+    const ordem={'AVES':1,'BOVINO':2,'SUÍNO':3,'OUTROS':4};
+    grid.innerHTML=[...(DATA.catSummary||[])]
+      .sort((a,b)=>(ordem[a.categoria]||99)-(ordem[b.categoria]||99) || String(a.categoria).localeCompare(String(b.categoria),'pt-BR'))
+      .map(c=>`<div class="category-card"><strong>${c.categoria}</strong><div class="big">${fmt(c.total_rs)}</div><small>${fmtKg(c.total_kg)} • ${c.transacoes.toLocaleString('pt-BR')} transações • ${c.cortes} cortes</small></div>`).join('');
   }
   buildTopCortesChart();
   updateCorteChart();
@@ -779,7 +845,7 @@ function buildTopCortesChart(){
 }
 
 function updateCorteChart(){
-  const sel=document.getElementById('corte-select').value || DATA.cutSummary[0]?.nome;
+  const sel=document.getElementById('corte-select')?.value || getFilteredCuts()[0]?.nome || DATA.cutSummary[0]?.nome;
   document.getElementById('corte-title').textContent=sel.replace(' kg','')+' — Por Operador';
   const data=(DATA.cortes[sel]||[]).sort((a,b)=>b.v-a.v);
   if(corteChartInst){corteChartInst.destroy();}
