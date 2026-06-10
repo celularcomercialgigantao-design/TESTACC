@@ -145,7 +145,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   .op-selector{flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px}.op-chip{white-space:nowrap}
   .rank-table{min-width:900px}.scroll-hint{display:block}.rank-scroll{padding-bottom:8px}.login-card{width:92%;padding:32px 24px}.login-logo h1{font-size:22px}
 }
-@media(max-width:520px){.topbar-right{gap:6px}.badge-live{font-size:10px}.chart-card canvas{max-height:360px}.cut-table{min-width:640px}}
+@media(max-width:520px){.topbar-right{gap:6px}.btn-export-pdf{padding:7px 9px;font-size:11px}.badge-live{font-size:10px}.chart-card canvas{max-height:360px}.cut-table{min-width:640px}}
 
 
 /* AJUSTES MOBILE E LIMPEZA */
@@ -197,6 +197,55 @@ select, option{font-family:'Inter',sans-serif;}
 .executive-summary{display:grid;gap:10px;font-size:13px;color:#374151;line-height:1.55;}
 .executive-summary p{background:#f9fafb;border:1px solid #eef2f0;border-radius:12px;padding:12px 14px;}
 @media(max-width:900px){.bi-card .bi-value{font-size:20px}.top-cortes-list{min-width:760px}}
+
+/* AJUSTES FINAIS 100% EXECUTIVO */
+.action-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 16px 0;}
+.btn-action{border:none;background:linear-gradient(135deg,#1a7c3e,#24a855);color:#fff;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 6px 16px rgba(26,124,62,.18);}
+.btn-action.secondary{background:#fff;color:#1a7c3e;border:1.5px solid #1a7c3e;box-shadow:none;}
+.btn-export-pdf{border:none;background:linear-gradient(135deg,#f5a623,#e8941a);color:#fff;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 6px 14px rgba(245,166,35,.22);white-space:nowrap;}
+.btn-export-pdf:hover{opacity:.92;}
+.filter-select{border:1.5px solid var(--border);background:#fff;border-radius:10px;padding:9px 12px;font-size:12px;font-weight:700;color:#1f2937;}
+.mobile-rank-cards{display:none;gap:10px;flex-direction:column;}
+.mobile-rank-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 4px 12px rgba(0,0,0,.035);}
+.mobile-rank-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;}
+.mobile-rank-name{font-weight:800;font-size:14px;color:#111827;}
+.mobile-rank-pos{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;background:#f3f4f6;color:#374151;}
+.mobile-rank-pos.top1{background:#fef08a;color:#854d0e}.mobile-rank-pos.top2{background:#e2e8f0;color:#475569}.mobile-rank-pos.top3{background:#fde7c3;color:#9a3412}
+.mobile-rank-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mobile-rank-metrics div{background:#f8faf9;border-radius:10px;padding:9px;}
+.mobile-rank-metrics small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;font-weight:700;margin-bottom:3px;}
+.mobile-rank-metrics strong{font-size:13px;color:#1a7c3e;}
+@media(max-width:900px){.rank-scroll{display:none}.mobile-rank-cards{display:flex}.ranking-actions{position:sticky;top:54px;z-index:20;background:var(--bg);padding:8px 0}.action-row .btn-action,.action-row .filter-select{width:100%}}
+@media print{.sidebar,.topbar,.mobile-menu,.btn-action,.ranking-actions{display:none!important}.main{margin-left:0!important}.page{display:block!important}.content{padding:10px!important}.chart-card,.bi-card{break-inside:avoid}}
+
+/* EXPORTAÇÃO PDF - AJUSTE PARA CABER TODAS AS INFORMAÇÕES */
+.pdf-only{display:none;}
+@media print{
+  @page{size:A4 landscape;margin:6mm;}
+  html,body{background:#fff!important;width:100%!important;min-height:auto!important;display:block!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  #login-screen,.sidebar,.topbar,.mobile-menu,.btn-action,.ranking-actions,.scroll-hint,.mobile-rank-cards{display:none!important;}
+  #app{display:block!important;min-height:auto!important;}
+  .main{margin-left:0!important;display:block!important;width:100%!important;}
+  .content{padding:0!important;zoom:.62;}
+  .page{display:block!important;page-break-after:always;break-after:page;margin:0!important;padding:0!important;}
+  .page:last-child{page-break-after:auto;break-after:auto;}
+  .page-header{margin-bottom:10px!important;}
+  .page-header h2{font-size:18px!important;margin-bottom:2px!important;}
+  .page-header p{font-size:10px!important;}
+  .kpi-grid{grid-template-columns:repeat(4,1fr)!important;gap:8px!important;margin-bottom:10px!important;}
+  .bi-grid{grid-template-columns:repeat(5,1fr)!important;gap:8px!important;margin-bottom:10px!important;}
+  .charts-row,.charts-row.three{grid-template-columns:1fr 1fr!important;gap:8px!important;margin-bottom:10px!important;}
+  .category-grid{grid-template-columns:repeat(4,1fr)!important;gap:8px!important;}
+  .kpi-card,.chart-card,.bi-card,.category-card,.exec-metric,.category-rank,.mobile-rank-card{box-shadow:none!important;border:1px solid #d9e3dd!important;padding:10px!important;break-inside:avoid;page-break-inside:avoid;}
+  .chart-card canvas{max-height:190px!important;}
+  .chart-card div[style*="height:300px"],.chart-card div[style*="height:320px"],.chart-card div[style*="height:360px"]{height:190px!important;}
+  .rank-scroll{display:block!important;overflow:visible!important;padding:0!important;}
+  .rank-scroll .rank-table,.rank-table,.cut-table,.top-cortes-list{min-width:0!important;width:100%!important;table-layout:fixed!important;}
+  .rank-table th,.rank-table td,.cut-table th,.cut-table td,.top-cortes-list th,.top-cortes-list td{font-size:8.5px!important;padding:4px 5px!important;white-space:normal!important;word-break:break-word!important;}
+  .kpi-value{font-size:18px!important}.bi-value{font-size:14px!important}.bi-sub,.chart-sub,.kpi-sub{font-size:9px!important}.chart-title{font-size:11px!important}.exec-metrics{grid-template-columns:repeat(5,1fr)!important;gap:6px!important}.executive-summary p{font-size:10px!important;padding:8px!important;margin-bottom:5px!important}.performance-row{grid-template-columns:34px 1fr 50px!important;padding:6px!important}.alert-item{font-size:10px!important;padding:8px!important}.filter-bar,.op-selector{display:none!important;}
+}
+
+
 </style>
 </head>
 <body>
@@ -233,7 +282,7 @@ select, option{font-family:'Inter',sans-serif;}
       <div class="logo-sub">Gestão de Operadores</div>
     </div>
     <div class="sidebar-section">Principal</div>
-    <div class="nav-item active" onclick="showPage('dashboard')">
+    <div class="nav-item" onclick="showPage('dashboard')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Dashboard Geral
     </div>
@@ -245,9 +294,9 @@ select, option{font-family:'Inter',sans-serif;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       Cortes de Carne
     </div>
-    <div class="nav-item" onclick="showPage('diferenciais')">
+    <div class="nav-item active" onclick="showPage('diferenciais')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-7"/><circle cx="7" cy="15" r="1"/><circle cx="11" cy="11" r="1"/><circle cx="14" cy="14" r="1"/><circle cx="19" cy="7" r="1"/></svg>
-      Performance BI
+      Resumo Executivo
     </div>
     <div class="nav-item" onclick="showPage('ranking')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -267,8 +316,9 @@ select, option{font-family:'Inter',sans-serif;}
 
   <div class="main">
     <div class="topbar">
-      <button class="mobile-menu" onclick="toggleMenu()">☰</button><span class="topbar-title" id="topbar-title">Dashboard Geral</span>
+      <button class="mobile-menu" onclick="toggleMenu()">☰</button><span class="topbar-title" id="topbar-title">Resumo Executivo</span>
       <div class="topbar-right">
+        <button class="btn-export-pdf" onclick="exportarPDF()">📥 Exportar PDF</button>
         <span class="period-badge">01/05/2026 a 31/05/2026</span>
         <span class="badge-live">● Ao vivo</span>
       </div>
@@ -277,7 +327,7 @@ select, option{font-family:'Inter',sans-serif;}
     <div class="content">
 
       <!-- DASHBOARD PAGE -->
-      <div class="page active" id="page-dashboard">
+      <div class="page" id="page-dashboard">
         <div class="page-header">
           <h2>Dashboard de Operadores</h2>
           <p>Visão consolidada de vendas — período: 01 a 31 de maio de 2026</p>
@@ -390,10 +440,11 @@ select, option{font-family:'Inter',sans-serif;}
       </div>
 
       <!-- DIFERENCIAIS PAGE -->
-      <div class="page" id="page-diferenciais">
+      <div class="page active" id="page-diferenciais">
         <div class="page-header">
-          <h2>Performance BI</h2>
-          <p>Análise executiva com base nos dados fornecidos — período: 01 a 31 de maio de 2026</p>
+          <h2>Resumo Executivo</h2>
+          <p>Primeira tela gerencial com indicadores, alertas e ranking inteligente — período: 01 a 31 de maio de 2026</p>
+          <div class="action-row"><button class="btn-action" onclick="exportarPDF()">📥 Exportar PDF</button><button class="btn-action secondary" onclick="showPage('ranking')">🏆 Ver ranking completo</button><button class="btn-action secondary" onclick="showPage('cortes')">🥩 Ver cortes</button></div>
         </div>
 
         <div class="bi-grid" id="bi-highlights">
@@ -483,20 +534,28 @@ select, option{font-family:'Inter',sans-serif;}
       <div class="page" id="page-ranking">
         <div class="page-header">
           <h2>Ranking de Operadores</h2>
-          <p>Classificação por faturamento, volume e número de transações</p>
+          <p>Classificação por faturamento, volume, transações, venda média e valor agregado</p>
         </div>
         <div class="ranking-actions">
           <button class="ranking-tab active" id="tab-mais" onclick="setRankingMode('mais')">Mais vendidos</button>
           <button class="ranking-tab" id="tab-menos" onclick="setRankingMode('menos')">Menos vendidos</button>
+          <select class="filter-select" id="ranking-sort" onchange="buildRankingPage()">
+            <option value="faturamento">Ordenar por faturamento</option>
+            <option value="peso">Ordenar por peso</option>
+            <option value="transacoes">Ordenar por transações</option>
+            <option value="ticket">Ordenar por venda média</option>
+            <option value="valor_kg">Ordenar por valor agregado R$/kg</option>
+          </select>
         </div>
         <div class="chart-card" style="margin-bottom:20px;">
           <div class="rank-scroll"><table class="rank-table" id="rank-table"></table></div>
+          <div class="mobile-rank-cards" id="mobile-rank-cards"></div>
           <div class="scroll-hint">Arraste a tabela para o lado direito para ver volume, transações, ticket médio e participação.</div>
         </div>
         <div class="charts-row">
           <div class="chart-card">
-            <div class="chart-title">Ticket Médio por Operador</div>
-            <div class="chart-sub">R$ médio por transação</div>
+            <div class="chart-title">Venda média por transação</div>
+            <div class="chart-sub">Faturamento dividido pela quantidade de vendas</div>
             <div style="position:relative;height:260px;"><canvas id="chartTicket" role="img" aria-label="Ticket médio por operador">Valor médio por transação de cada operador.</canvas></div>
           </div>
           <div class="chart-card">
@@ -550,7 +609,7 @@ function showPage(pg){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+pg).classList.add('active');
-  const labels={'dashboard':'Dashboard Geral','operadores':'Análise por Operador','cortes':'Cortes de Carne','diferenciais':'Performance BI','ranking':'Ranking de Operadores'};
+  const labels={'dashboard':'Dashboard Geral','operadores':'Análise por Operador','cortes':'Cortes de Carne','diferenciais':'Resumo Executivo','ranking':'Ranking de Operadores'};
   document.getElementById('topbar-title').textContent=labels[pg];
   const nav=[...document.querySelectorAll('.nav-item')].find(n=>n.getAttribute('onclick')?.includes(`'${pg}'`)); if(nav) nav.classList.add('active');
 }
@@ -832,10 +891,12 @@ function setRankingMode(mode){
 }
 
 function buildRankingPage(){
-  const ops=[...DATA.operators].sort((a,b)=> rankingMode==='menos' ? a.total_rs-b.total_rs : b.total_rs-a.total_rs);
+  const sortBy=document.getElementById('ranking-sort')?.value || 'faturamento';
+  const metric=(o)=> sortBy==='peso' ? o.total_kg : sortBy==='transacoes' ? o.transacoes : sortBy==='ticket' ? (o.total_rs/o.transacoes) : sortBy==='valor_kg' ? (o.total_rs/o.total_kg) : o.total_rs;
+  const ops=[...DATA.operators].sort((a,b)=> rankingMode==='menos' ? metric(a)-metric(b) : metric(b)-metric(a));
   const max=Math.max(...DATA.operators.map(o=>o.total_rs));
   let html=`<thead><tr>
-    <th>#</th><th>Operador</th><th>Faturamento</th><th>Volume (kg)</th><th>Transações</th><th>Ticket Médio</th><th>Participação</th>
+    <th>#</th><th>Operador</th><th>Faturamento</th><th>Volume (kg)</th><th>Transações</th><th>Venda média</th><th>% do faturamento</th>
   </tr></thead><tbody>`;
   ops.forEach((op,i)=>{
     const rk=i<3?`rank-${i+1}`:'rank-n';
@@ -854,6 +915,24 @@ function buildRankingPage(){
   });
   html+='</tbody>';
   document.getElementById('rank-table').innerHTML=html;
+  const cards=document.getElementById('mobile-rank-cards');
+  if(cards){
+    cards.innerHTML=ops.map((op,i)=>{
+      const pct=(op.total_rs/getTotalRs()*100).toFixed(1);
+      const posClass=i===0?'top1':i===1?'top2':i===2?'top3':'';
+      return `<div class="mobile-rank-card">
+        <div class="mobile-rank-head"><div class="mobile-rank-pos ${posClass}">${i+1}</div><div class="mobile-rank-name">${op.nome}</div></div>
+        <div class="mobile-rank-metrics">
+          <div><small>Faturamento</small><strong>${fmt2(op.total_rs)}</strong></div>
+          <div><small>Peso</small><strong>${op.total_kg.toLocaleString('pt-BR',{maximumFractionDigits:0})} kg</strong></div>
+          <div><small>Transações</small><strong>${op.transacoes.toLocaleString('pt-BR')}</strong></div>
+          <div><small>Venda média</small><strong>${fmt2(op.total_rs/op.transacoes)}</strong></div>
+          <div><small>Valor agregado</small><strong>${fmt2(op.total_rs/op.total_kg)}/kg</strong></div>
+          <div><small>% faturamento</small><strong>${pct}%</strong></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
 
   const shorts=ops.map(o=>o.short);
   const tickets=ops.map(o=>parseFloat((o.total_rs/o.transacoes).toFixed(2)));
@@ -879,6 +958,30 @@ function buildRankingPage(){
       scales:{x:{ticks:{font:{size:9},maxRotation:45}},y:{ticks:{callback:v=>'R$ '+v},grid:{color:'#f3f4f6'}}}
     }
   });
+}
+
+
+function exportarPDF(){
+  const app=document.getElementById('app');
+  const login=document.getElementById('login-screen');
+  const activePage=document.querySelector('.page.active')?.id || 'page-diferenciais';
+  const oldTitle=document.title;
+  document.title='Relatorio_Gigantao_Operadores_01_a_31_Maio_2026';
+  if(login) login.style.display='none';
+  if(app) app.style.display='block';
+  document.body.classList.add('exportando-pdf');
+  // Mostra todas as abas somente na impressão, para o PDF sair completo.
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>{
+      document.body.classList.remove('exportando-pdf');
+      document.title=oldTitle;
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      const pg=document.getElementById(activePage);
+      if(pg) pg.classList.add('active');
+      if(app) app.style.display='flex';
+    },500);
+  },150);
 }
 
 document.getElementById('pass-input').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
