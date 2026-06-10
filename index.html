@@ -149,6 +149,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 
 /* AJUSTES MOBILE E LIMPEZA */
+
+.exec-metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px;}
+.exec-metric{background:#f9fafb;border:1px solid #eef2f0;border-radius:12px;padding:12px 14px;}
+.exec-metric small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:6px;}
+.exec-metric strong{font-size:18px;color:#1a7c3e;display:block;line-height:1.15;}
+.exec-note{background:#fff7ed!important;border-color:#fed7aa!important;color:#7c2d12!important;}
+@media(max-width:900px){.exec-metrics{grid-template-columns:1fr 1fr}.exec-metric strong{font-size:15px}}
+@media(max-width:520px){.exec-metrics{grid-template-columns:1fr}}
+
 select, option{font-family:'Inter',sans-serif;}
 @media (max-width: 768px){
   .filter-bar select{width:100%;max-width:100%;font-size:13px;}
@@ -414,7 +423,7 @@ select, option{font-family:'Inter',sans-serif;}
               <div class="category-rank"><h4>🥩 Bovinos</h4><p><strong>Stefani M.</strong></p><p>Maior participação entre cortes bovinos.</p></div>
               <div class="category-rank"><h4>🍗 Aves</h4><p><strong>Cassiano S.</strong></p><p>Destaque em volume e transações de aves.</p></div>
               <div class="category-rank"><h4>🐖 Suínos</h4><p><strong>Natalia B.</strong></p><p>Boa participação nos cortes suínos.</p></div>
-              <div class="category-rank"><h4>⭐ Eficiência</h4><p><strong>José L.</strong></p><p>Destaque em aproveitamento R$/kg.</p></div>
+              <div class="category-rank"><h4>💎 Valor agregado R$/kg</h4><p><strong>José L.</strong></p><p>Maior faturamento gerado para cada kg vendido.</p></div>
             </div>
           </div>
         </div>
@@ -455,10 +464,17 @@ select, option{font-family:'Inter',sans-serif;}
         <div class="chart-card">
           <div class="chart-title">Resumo Executivo</div>
           <div class="chart-sub">Leitura rápida para gerente, supervisor ou diretoria</div>
-          <div class="executive-summary">
+          <div class="executive-summary" id="executive-summary">
+            <div class="exec-metrics">
+              <div class="exec-metric"><small>Faturamento</small><strong>R$ 751 mil</strong></div>
+              <div class="exec-metric"><small>Peso</small><strong>27.742 kg</strong></div>
+              <div class="exec-metric"><small>Transações</small><strong>20.797</strong></div>
+              <div class="exec-metric"><small>Ticket médio</small><strong>R$ 36,11</strong></div>
+              <div class="exec-metric"><small>R$/kg médio</small><strong>R$ 27,07</strong></div>
+            </div>
             <p><strong>Resultado geral:</strong> o açougue atingiu aproximadamente <strong>R$ 751 mil</strong> em faturamento, com <strong>27.742 kg</strong> vendidos e <strong>20.797 transações</strong>.</p>
             <p><strong>Melhor desempenho individual:</strong> Stefani M. lidera em faturamento, seguida por Cassiano S. e Natalia B.</p>
-            <p><strong>Principal oportunidade:</strong> acompanhar operadores abaixo da média e reforçar os cortes de maior giro, principalmente Acém Bovino, Contra Filé e Costela Minga.</p>
+            <p class="exec-note"><strong>Ponto de atenção:</strong> acompanhar operadores abaixo da média e reforçar os cortes de maior giro, principalmente Acém Bovino, Contra Filé e Costela Minga.</p>
           </div>
         </div>
       </div>
@@ -484,9 +500,9 @@ select, option{font-family:'Inter',sans-serif;}
             <div style="position:relative;height:260px;"><canvas id="chartTicket" role="img" aria-label="Ticket médio por operador">Valor médio por transação de cada operador.</canvas></div>
           </div>
           <div class="chart-card">
-            <div class="chart-title">Eficiência: R$/kg Vendido</div>
-            <div class="chart-sub">Valor gerado por quilo</div>
-            <div style="position:relative;height:260px;"><canvas id="chartEfficiency" role="img" aria-label="Eficiência em reais por kg vendido">Receita por quilograma vendido por operador.</canvas></div>
+            <div class="chart-title">Valor agregado: R$/kg vendido</div>
+            <div class="chart-sub">Faturamento gerado por quilo vendido</div>
+            <div style="position:relative;height:260px;"><canvas id="chartEfficiency" role="img" aria-label="Valor agregado em reais por kg vendido">Faturamento gerado por quilograma vendido por operador.</canvas></div>
           </div>
         </div>
       </div>
@@ -742,7 +758,7 @@ function buildDiferenciaisPage(){
       <div class="bi-card"><div class="bi-label">Maior peso</div><div class="bi-value">${topKg.short}</div><div class="bi-sub">${fmtKg(topKg.total_kg)} vendidos</div></div>
       <div class="bi-card"><div class="bi-label">Mais transações</div><div class="bi-value">${topTr.short}</div><div class="bi-sub">${topTr.transacoes.toLocaleString('pt-BR')} vendas registradas</div></div>
       <div class="bi-card"><div class="bi-label">Maior ticket médio</div><div class="bi-value">${topTicket.short}</div><div class="bi-sub">${fmt2(topTicket.total_rs/topTicket.transacoes)} por transação</div></div>
-      <div class="bi-card"><div class="bi-label">Melhor R$/kg</div><div class="bi-value">${topEff.short}</div><div class="bi-sub">${fmt2(topEff.total_rs/topEff.total_kg)} por kg</div></div>`;
+      <div class="bi-card"><div class="bi-label">Valor agregado R$/kg</div><div class="bi-value">${topEff.short}</div><div class="bi-sub">${fmt2(topEff.total_rs/topEff.total_kg)} por kg vendido</div></div>`;
   }
   const maxRs=Math.max(...ops.map(o=>o.total_rs)), maxKg=Math.max(...ops.map(o=>o.total_kg)), maxTr=Math.max(...ops.map(o=>o.transacoes)), maxTicket=Math.max(...ops.map(o=>o.total_rs/o.transacoes));
   const scored=ops.map(o=>{
@@ -756,10 +772,17 @@ function buildDiferenciaisPage(){
   const cats=operatorCategoryTotals();
   const catBox=document.getElementById('category-rankings');
   if(catBox){
-    catBox.innerHTML=['BOVINO','AVES','SUÍNO','OUTROS'].map(cat=>{
+    const catInfo={
+      'BOVINO':{icon:'🥩',desc:'Maior faturamento em cortes bovinos'},
+      'AVES':{icon:'🍗',desc:'Maior faturamento em aves'},
+      'SUÍNO':{icon:'🐖',desc:'Maior faturamento em suínos'},
+      'OUTROS':{icon:'📦',desc:'Maior faturamento em outros itens'}
+    };
+    const catCards=['BOVINO','AVES','SUÍNO','OUTROS'].map(cat=>{
       const top=[...cats].sort((a,b)=>(b[cat]||0)-(a[cat]||0))[0];
-      return `<div class="category-rank"><h4>${cat}</h4><p><strong>${top?.short||'-'}</strong></p><p>${fmt2(top?.[cat]||0)}</p></div>`;
+      return `<div class="category-rank"><h4>${catInfo[cat].icon} ${cat}</h4><p><strong>${top?.short||'-'}</strong></p><p>${fmt2(top?.[cat]||0)}</p><p>${catInfo[cat].desc}</p></div>`;
     }).join('');
+    catBox.innerHTML=catCards+`<div class="category-rank"><h4>💎 Valor agregado R$/kg</h4><p><strong>${topEff.short}</strong></p><p>${fmt2(topEff.total_rs/topEff.total_kg)} por kg vendido</p><p>Mostra quem gera mais faturamento para cada kg.</p></div>`;
   }
   const topCuts=[...(DATA.cutSummary||[])].sort((a,b)=>b.total_rs-a.total_rs).slice(0,10);
   const topTable=document.getElementById('top-cortes-bi');
@@ -776,7 +799,24 @@ function buildDiferenciaisPage(){
       <div class="alert-item">⚠️ ${below} operadores estão abaixo da média de faturamento (${fmt2(avg)}).</div>
       <div class="alert-item">🥩 Corte líder do mês: <strong>${bestCut?.nome.replace(' kg','')||'-'}</strong> com ${fmt2(bestCut?.total_rs||0)}.</div>
       <div class="alert-item">📉 ${lowCuts} cortes/produtos tiveram até 3 transações. Vale revisar exposição, preço ou cadastro.</div>
-      <div class="alert-item">📊 Ticket médio geral: <strong>${fmt2(totalRs/totalTr)}</strong> por transação e eficiência média de <strong>${fmt2(totalRs/totalKg)}/kg</strong>.</div>`;
+      <div class="alert-item">📊 Ticket médio geral: <strong>${fmt2(totalRs/totalTr)}</strong> por transação e valor agregado médio de <strong>${fmt2(totalRs/totalKg)}/kg</strong>.</div>`;
+  }
+  const exec=document.getElementById('executive-summary');
+  if(exec){
+    const low=[...ops].sort((a,b)=>a.total_rs-b.total_rs)[0];
+    const top3=[...ops].sort((a,b)=>b.total_rs-a.total_rs).slice(0,3);
+    exec.innerHTML=`
+      <div class="exec-metrics">
+        <div class="exec-metric"><small>Faturamento</small><strong>${fmt2(totalRs)}</strong></div>
+        <div class="exec-metric"><small>Peso</small><strong>${fmtKg(totalKg)}</strong></div>
+        <div class="exec-metric"><small>Transações</small><strong>${totalTr.toLocaleString('pt-BR')}</strong></div>
+        <div class="exec-metric"><small>Ticket médio</small><strong>${fmt2(totalRs/totalTr)}</strong></div>
+        <div class="exec-metric"><small>R$/kg médio</small><strong>${fmt2(totalRs/totalKg)}</strong></div>
+      </div>
+      <p><strong>Resultado geral:</strong> o açougue atingiu ${fmt2(totalRs)} em faturamento, com ${fmtKg(totalKg)} vendidos e ${totalTr.toLocaleString('pt-BR')} transações no período.</p>
+      <p><strong>Top 3 operadores:</strong> ${top3.map(o=>`${o.short} (${fmt2(o.total_rs)})`).join(', ')}.</p>
+      <p><strong>Valor agregado:</strong> ${topEff.short} tem o melhor R$/kg, gerando ${fmt2(topEff.total_rs/topEff.total_kg)} para cada kg vendido.</p>
+      <p class="exec-note"><strong>Ponto de atenção:</strong> ${below} operadores estão abaixo da média de faturamento e ${low.short} é o menor faturamento do ranking. Reforce acompanhamento, mix de cortes e abordagem comercial.</p>`;
   }
 }
 
