@@ -216,6 +216,12 @@ select, option{font-family:'Inter',sans-serif;}
 .mobile-rank-metrics small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;font-weight:700;margin-bottom:3px;}
 .mobile-rank-metrics strong{font-size:13px;color:#1a7c3e;}
 @media(max-width:900px){.rank-scroll{display:none}.mobile-rank-cards{display:flex}.ranking-actions{position:sticky;top:54px;z-index:20;background:var(--bg);padding:8px 0}.action-row .btn-action,.action-row .filter-select{width:100%}}
+
+.tooltip-info{position:relative;cursor:help;}
+.tooltip-info:hover::after{content:attr(data-tip);position:absolute;left:0;top:calc(100% + 8px);z-index:9999;min-width:240px;max-width:360px;background:#111827;color:#fff;border-radius:10px;padding:10px 12px;font-size:11px;font-weight:500;line-height:1.35;box-shadow:0 10px 24px rgba(0,0,0,.22);white-space:normal;text-transform:none;letter-spacing:0;}
+.tooltip-info:hover::before{content:"";position:absolute;left:16px;top:100%;z-index:9999;border:7px solid transparent;border-bottom-color:#111827;}
+.rank-table th.tooltip-info:hover::after{top:28px;}
+@media(max-width:900px){.tooltip-info:hover::after{left:auto;right:0;min-width:220px;max-width:300px}}
 @media print{.sidebar,.topbar,.mobile-menu,.btn-action,.ranking-actions{display:none!important}.main{margin-left:0!important}.page{display:block!important}.content{padding:10px!important}.chart-card,.bi-card{break-inside:avoid}}
 
 /* EXPORTAÇÃO PDF - AJUSTE PARA CABER TODAS AS INFORMAÇÕES */
@@ -474,7 +480,7 @@ select, option{font-family:'Inter',sans-serif;}
               <div class="category-rank"><h4>🥩 Bovinos</h4><p><strong>Stefani M.</strong></p><p>Maior participação entre cortes bovinos.</p></div>
               <div class="category-rank"><h4>🍗 Aves</h4><p><strong>Cassiano S.</strong></p><p>Destaque em volume e transações de aves.</p></div>
               <div class="category-rank"><h4>🐖 Suínos</h4><p><strong>Natalia B.</strong></p><p>Boa participação nos cortes suínos.</p></div>
-              <div class="category-rank"><h4>💎 Valor agregado R$/kg</h4><p><strong>José L.</strong></p><p>Maior faturamento gerado para cada kg vendido.</p></div>
+              <div class="category-rank tooltip-info" data-tip="Valor agregado = faturamento ÷ kg vendido. Mostra quanto cada operador gera de faturamento para cada 1 kg vendido."><h4>💎 Valor agregado R$/kg</h4><p><strong>Reinando D.</strong></p><p>R$ 28,26 por kg vendido.</p><p>Fórmula: faturamento ÷ kg vendido.</p></div>
             </div>
           </div>
         </div>
@@ -584,6 +590,12 @@ let opDailyChart = null;
 function fmt(v){return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});}
 function fmt2(v){return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function fmtKg(v){return Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3})+' kg';}
+function valorKg(o){return Number(o?.total_kg||0) ? Number(o.total_rs||0)/Number(o.total_kg||0) : 0;}
+function vendaMedia(o){return Number(o?.transacoes||0) ? Number(o.total_rs||0)/Number(o.transacoes||0) : 0;}
+function pctFaturamento(o){const t=getTotalRs(); return t ? Number(o.total_rs||0)/t*100 : 0;}
+function tipVendaMedia(o){return `Venda média = faturamento ÷ transações. ${fmt2(o.total_rs)} ÷ ${Number(o.transacoes||0).toLocaleString('pt-BR')} = ${fmt2(vendaMedia(o))} por transação.`;}
+function tipPctFaturamento(o){return `% do faturamento = faturamento do operador ÷ faturamento total. ${fmt2(o.total_rs)} ÷ ${fmt2(getTotalRs())} = ${pctFaturamento(o).toFixed(1).replace('.',',')}%.`;}
+function tipValorAgregado(o){return `Valor agregado R$/kg = faturamento ÷ kg vendido. ${fmt2(o.total_rs)} ÷ ${Number(o.total_kg||0).toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3})} kg = ${fmt2(valorKg(o))}/kg.`;}
 function getTotalRs(){return DATA.operators.reduce((s,o)=>s+Number(o.total_rs||0),0);}
 function toggleMenu(){document.querySelector('.sidebar').classList.toggle('open');}
 
@@ -808,16 +820,16 @@ function buildDiferenciaisPage(){
   const topFat=[...ops].sort((a,b)=>b.total_rs-a.total_rs)[0];
   const topKg=[...ops].sort((a,b)=>b.total_kg-a.total_kg)[0];
   const topTr=[...ops].sort((a,b)=>b.transacoes-a.transacoes)[0];
-  const topTicket=[...ops].sort((a,b)=>(b.total_rs/b.transacoes)-(a.total_rs/a.transacoes))[0];
-  const topEff=[...ops].sort((a,b)=>(b.total_rs/b.total_kg)-(a.total_rs/a.total_kg))[0];
+  const topTicket=[...ops].sort((a,b)=>vendaMedia(b)-vendaMedia(a))[0];
+  const topEff=[...ops].sort((a,b)=>valorKg(b)-valorKg(a))[0];
   const highlights=document.getElementById('bi-highlights');
   if(highlights){
     highlights.innerHTML=`
       <div class="bi-card"><div class="bi-label">Maior faturamento</div><div class="bi-value">${topFat.short}</div><div class="bi-sub">${fmt2(topFat.total_rs)} • ${(topFat.total_rs/totalRs*100).toFixed(1)}% do total</div></div>
       <div class="bi-card"><div class="bi-label">Maior peso</div><div class="bi-value">${topKg.short}</div><div class="bi-sub">${fmtKg(topKg.total_kg)} vendidos</div></div>
       <div class="bi-card"><div class="bi-label">Mais transações</div><div class="bi-value">${topTr.short}</div><div class="bi-sub">${topTr.transacoes.toLocaleString('pt-BR')} vendas registradas</div></div>
-      <div class="bi-card"><div class="bi-label">Maior ticket médio</div><div class="bi-value">${topTicket.short}</div><div class="bi-sub">${fmt2(topTicket.total_rs/topTicket.transacoes)} por transação</div></div>
-      <div class="bi-card"><div class="bi-label">Valor agregado R$/kg</div><div class="bi-value">${topEff.short}</div><div class="bi-sub">${fmt2(topEff.total_rs/topEff.total_kg)} por kg vendido</div></div>`;
+      <div class="bi-card tooltip-info" data-tip="${tipVendaMedia(topTicket)}"><div class="bi-label">Maior ticket médio</div><div class="bi-value">${topTicket.short}</div><div class="bi-sub">${fmt2(vendaMedia(topTicket))} por transação</div></div>
+      <div class="bi-card tooltip-info" data-tip="${tipValorAgregado(topEff)}"><div class="bi-label">Valor agregado R$/kg</div><div class="bi-value">${topEff.short}</div><div class="bi-sub">${fmt2(valorKg(topEff))} por kg vendido</div></div>`;
   }
   const maxRs=Math.max(...ops.map(o=>o.total_rs)), maxKg=Math.max(...ops.map(o=>o.total_kg)), maxTr=Math.max(...ops.map(o=>o.transacoes)), maxTicket=Math.max(...ops.map(o=>o.total_rs/o.transacoes));
   const scored=ops.map(o=>{
@@ -841,7 +853,7 @@ function buildDiferenciaisPage(){
       const top=[...cats].sort((a,b)=>(b[cat]||0)-(a[cat]||0))[0];
       return `<div class="category-rank"><h4>${catInfo[cat].icon} ${cat}</h4><p><strong>${top?.short||'-'}</strong></p><p>${fmt2(top?.[cat]||0)}</p><p>${catInfo[cat].desc}</p></div>`;
     }).join('');
-    catBox.innerHTML=catCards+`<div class="category-rank"><h4>💎 Valor agregado R$/kg</h4><p><strong>${topEff.short}</strong></p><p>${fmt2(topEff.total_rs/topEff.total_kg)} por kg vendido</p><p>Mostra quem gera mais faturamento para cada kg.</p></div>`;
+    catBox.innerHTML=catCards+`<div class="category-rank tooltip-info" data-tip="${tipValorAgregado(topEff)}"><h4>💎 Valor agregado R$/kg</h4><p><strong>${topEff.short}</strong></p><p>${fmt2(valorKg(topEff))} por kg vendido</p><p>Fórmula: faturamento ÷ kg vendido.</p></div>`;
   }
   const topCuts=[...(DATA.cutSummary||[])].sort((a,b)=>b.total_rs-a.total_rs).slice(0,10);
   const topTable=document.getElementById('top-cortes-bi');
@@ -869,12 +881,12 @@ function buildDiferenciaisPage(){
         <div class="exec-metric"><small>Faturamento</small><strong>${fmt2(totalRs)}</strong></div>
         <div class="exec-metric"><small>Peso</small><strong>${fmtKg(totalKg)}</strong></div>
         <div class="exec-metric"><small>Transações</small><strong>${totalTr.toLocaleString('pt-BR')}</strong></div>
-        <div class="exec-metric"><small>Ticket médio</small><strong>${fmt2(totalRs/totalTr)}</strong></div>
-        <div class="exec-metric"><small>R$/kg médio</small><strong>${fmt2(totalRs/totalKg)}</strong></div>
+        <div class="exec-metric tooltip-info" data-tip="Venda média geral = faturamento total ÷ total de transações. ${fmt2(totalRs)} ÷ ${totalTr.toLocaleString('pt-BR')} = ${fmt2(totalRs/totalTr)}."><small>Ticket médio</small><strong>${fmt2(totalRs/totalTr)}</strong></div>
+        <div class="exec-metric tooltip-info" data-tip="Valor agregado médio = faturamento total ÷ peso total. ${fmt2(totalRs)} ÷ ${Number(totalKg).toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3})} kg = ${fmt2(totalRs/totalKg)}/kg."><small>R$/kg médio</small><strong>${fmt2(totalRs/totalKg)}</strong></div>
       </div>
       <p><strong>Resultado geral:</strong> o açougue atingiu ${fmt2(totalRs)} em faturamento, com ${fmtKg(totalKg)} vendidos e ${totalTr.toLocaleString('pt-BR')} transações no período.</p>
       <p><strong>Top 3 operadores:</strong> ${top3.map(o=>`${o.short} (${fmt2(o.total_rs)})`).join(', ')}.</p>
-      <p><strong>Valor agregado:</strong> ${topEff.short} tem o melhor R$/kg, gerando ${fmt2(topEff.total_rs/topEff.total_kg)} para cada kg vendido.</p>
+      <p class="tooltip-info" data-tip="${tipValorAgregado(topEff)}"><strong>Valor agregado R$/kg:</strong> ${topEff.short} lidera porque gera ${fmt2(valorKg(topEff))} para cada kg vendido. Cálculo usado: ${fmt2(topEff.total_rs)} ÷ ${Number(topEff.total_kg).toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3})} kg.</p>
       <p class="exec-note"><strong>Ponto de atenção:</strong> ${below} operadores estão abaixo da média de faturamento e ${low.short} é o menor faturamento do ranking. Reforce acompanhamento, mix de cortes e abordagem comercial.</p>`;
   }
 }
@@ -892,16 +904,17 @@ function setRankingMode(mode){
 
 function buildRankingPage(){
   const sortBy=document.getElementById('ranking-sort')?.value || 'faturamento';
-  const metric=(o)=> sortBy==='peso' ? o.total_kg : sortBy==='transacoes' ? o.transacoes : sortBy==='ticket' ? (o.total_rs/o.transacoes) : sortBy==='valor_kg' ? (o.total_rs/o.total_kg) : o.total_rs;
+  const metric=(o)=> sortBy==='peso' ? o.total_kg : sortBy==='transacoes' ? o.transacoes : sortBy==='ticket' ? vendaMedia(o) : sortBy==='valor_kg' ? valorKg(o) : o.total_rs;
   const ops=[...DATA.operators].sort((a,b)=> rankingMode==='menos' ? metric(a)-metric(b) : metric(b)-metric(a));
+  const topEff=[...DATA.operators].sort((a,b)=>valorKg(b)-valorKg(a))[0];
   const max=Math.max(...DATA.operators.map(o=>o.total_rs));
   let html=`<thead><tr>
-    <th>#</th><th>Operador</th><th>Faturamento</th><th>Volume (kg)</th><th>Transações</th><th>Venda média</th><th>% do faturamento</th>
+    <th>#</th><th>Operador</th><th>Faturamento</th><th>Volume (kg)</th><th>Transações</th><th class="tooltip-info" data-tip="Venda média = faturamento dividido pela quantidade de transações do operador.">Venda média</th><th class="tooltip-info" data-tip="% do faturamento = faturamento do operador dividido pelo faturamento total do período.">% do faturamento</th>
   </tr></thead><tbody>`;
   ops.forEach((op,i)=>{
     const rk=i<3?`rank-${i+1}`:'rank-n';
-    const ticket=(op.total_rs/op.transacoes).toFixed(2);
-    const pct=(op.total_rs/getTotalRs()*100).toFixed(1);
+    const ticket=vendaMedia(op).toFixed(2);
+    const pct=pctFaturamento(op).toFixed(1);
     const barW=Math.round(op.total_rs/max*100);
     html+=`<tr>
       <td><span class="rank-badge ${rk}">${i+1}</span></td>
@@ -909,8 +922,8 @@ function buildRankingPage(){
       <td style="color:#1a7c3e;font-weight:600">${fmt(op.total_rs)}</td>
       <td>${op.total_kg.toFixed(0)} kg</td>
       <td>${op.transacoes.toLocaleString()}</td>
-      <td>R$ ${parseFloat(ticket).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
-      <td><div style="display:flex;align-items:center;gap:8px"><div class="bar-mini" style="width:${barW}px;"></div><span style="font-size:12px">${pct}%</span></div></td>
+      <td class="tooltip-info" data-tip="${tipVendaMedia(op)}">R$ ${parseFloat(ticket).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      <td class="tooltip-info" data-tip="${tipPctFaturamento(op)}"><div style="display:flex;align-items:center;gap:8px"><div class="bar-mini" style="width:${barW}px;"></div><span style="font-size:12px">${pct}%</span></div></td>
     </tr>`;
   });
   html+='</tbody>';
@@ -926,16 +939,16 @@ function buildRankingPage(){
           <div><small>Faturamento</small><strong>${fmt2(op.total_rs)}</strong></div>
           <div><small>Peso</small><strong>${op.total_kg.toLocaleString('pt-BR',{maximumFractionDigits:0})} kg</strong></div>
           <div><small>Transações</small><strong>${op.transacoes.toLocaleString('pt-BR')}</strong></div>
-          <div><small>Venda média</small><strong>${fmt2(op.total_rs/op.transacoes)}</strong></div>
-          <div><small>Valor agregado</small><strong>${fmt2(op.total_rs/op.total_kg)}/kg</strong></div>
-          <div><small>% faturamento</small><strong>${pct}%</strong></div>
+          <div class="tooltip-info" data-tip="${tipVendaMedia(op)}"><small>Venda média</small><strong>${fmt2(vendaMedia(op))}</strong></div>
+          <div class="tooltip-info" data-tip="${tipValorAgregado(op)}"><small>Valor agregado</small><strong>${fmt2(valorKg(op))}/kg</strong></div>
+          <div class="tooltip-info" data-tip="${tipPctFaturamento(op)}"><small>% faturamento</small><strong>${pct}%</strong></div>
         </div>
       </div>`;
     }).join('');
   }
 
   const shorts=ops.map(o=>o.short);
-  const tickets=ops.map(o=>parseFloat((o.total_rs/o.transacoes).toFixed(2)));
+  const tickets=ops.map(o=>parseFloat(vendaMedia(o).toFixed(2)));
   if(charts.ticket){charts.ticket.destroy();}
   charts.ticket=new Chart(document.getElementById('chartTicket'),{
     type:'bar',
@@ -947,11 +960,11 @@ function buildRankingPage(){
     }
   });
 
-  const efficiency=ops.map(o=>parseFloat((o.total_rs/o.total_kg).toFixed(2)));
+  const efficiency=ops.map(o=>parseFloat(valorKg(o).toFixed(2)));
   if(charts.eff){charts.eff.destroy();}
   charts.eff=new Chart(document.getElementById('chartEfficiency'),{
     type:'bar',
-    data:{labels:shorts,datasets:[{data:efficiency,backgroundColor:ops.map((_,i)=>i===0?'#f5a623':'rgba(26,124,62,.6)'),borderRadius:4}]},
+    data:{labels:shorts,datasets:[{data:efficiency,backgroundColor:ops.map(o=>o.nome===topEff?.nome?'#f5a623':'rgba(26,124,62,.6)'),borderRadius:4}]},
     options:{
       responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$ '+ctx.raw.toFixed(2)+'/kg'}}},
