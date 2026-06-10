@@ -862,10 +862,21 @@ function updateCorteChart(){
 
 
 function getCategoryByCutName(nome){
-  const n=(nome||'').toUpperCase();
-  if(n.includes('FRANGO') || n.includes('FGO') || n.includes('ASA') || n.includes('COXA SOBRE') || n.includes('MOELA') || n.includes('CORAÇÃO FRANGO') || n.includes('CORACAO FRANGO')) return 'AVES';
-  if(n.includes('SUINO') || n.includes('SUÍNO') || n.includes('PERNIL') || n.includes('TOSCANA') || n.includes('BISTECA')) return 'SUÍNO';
-  if(n.includes('BOVINO') || n.includes('BOV') || n.includes('ACEM') || n.includes('ALCATRA') || n.includes('CONTRA') || n.includes('COSTELA') || n.includes('PATINHO') || n.includes('COXAO') || n.includes('FRALDINHA')) return 'BOVINO';
+  const raw=(nome||'').toUpperCase();
+  const n=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+
+  // Regras específicas primeiro para evitar cair na categoria errada
+  if(n.includes('PIZZA FRANGO')) return 'OUTROS';
+
+  // Suínos
+  if(n.includes('SUINO') || n.includes('SUINA') || n.includes('PERNIL') || n.includes('COSTELINHA') || n.includes('PALETA SUINO') || n.includes('TOUCINHO') || n.includes('CHOURICO') || n.includes('JOELHO') || n.includes('PE SUINO') || n.includes('RABO SUINO') || n.includes('BISTECA SUINO')) return 'SUÍNO';
+
+  // Aves
+  if(n.includes('SOBRECOXA') || n.includes('TULIPA') || n.includes('COXA SOBRE') || n.includes('COXINHA ASA') || n.includes('ASA FRANGO') || n.includes('PEITO FRANGO') || n.includes('FILE FRANGO') || n.includes('FRANGO PASSARINHO') || n.includes('FRANGO INTEIRO') || n.includes('FIGADO FRANGO') || n.includes('MOELA FRANGO') || n.includes('CORACAO FRANGO') || n.includes('FGO') || (n.includes('FRANGO') && !n.includes('PIZZA'))) return 'AVES';
+
+  // Bovinos, incluindo picanhas bovinas e carnes com osso
+  if(n.includes('PICANHA') || n.includes('BOVINO') || n.includes('BOV') || n.includes('ACEM') || n.includes('ALCATRA') || n.includes('CONTRA FILE') || n.includes('CONTRA') || n.includes('PATINHO') || n.includes('COXAO') || n.includes('FRALDINHA') || n.includes('PONTA PEITO') || n.includes('C/OSSO') || n.includes('OSSO BUCO') || n.includes('COSTELA') || n.includes('COSTELA RIPA') || n.includes('MOCOTO') || n.includes('BUCHO') || n.includes('CAUDA') || n.includes('CAPA FILE') || n.includes('LAGARTO') || n.includes('PALETA MIOLO')) return 'BOVINO';
+
   return 'OUTROS';
 }
 function operatorCategoryTotals(){
