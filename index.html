@@ -161,6 +161,29 @@ select, option{font-family:'Inter',sans-serif;}
 .sidebar-brand{text-align:center;}
 @media(max-width:900px){.logo-img-login{width:220px;}.logo-img-sidebar{width:160px;}}
 
+
+/* DIFERENCIAIS BI */
+.bi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;}
+.bi-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden;}
+.bi-card:before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,#1a7c3e,#f5a623);}
+.bi-label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;}
+.bi-value{font-size:18px;font-weight:800;color:#111827;line-height:1.15;}
+.bi-sub{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.35;}
+.performance-list{display:grid;gap:10px;}
+.performance-row{display:grid;grid-template-columns:42px 1fr 64px;gap:10px;align-items:center;padding:10px;border:1px solid #eef2f0;border-radius:12px;background:#fff;}
+.score-badge{height:34px;width:34px;border-radius:50%;background:#dcfce7;color:#15803d;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;}
+.score-bar{height:8px;background:#eef2f0;border-radius:999px;overflow:hidden;margin-top:6px;}
+.score-fill{height:100%;background:linear-gradient(90deg,#1a7c3e,#f5a623);border-radius:999px;}
+.alert-list{display:grid;gap:10px;}
+.alert-item{padding:12px 14px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;font-size:12px;color:#7c2d12;line-height:1.4;}
+.category-mini{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.category-rank{border:1px solid var(--border);border-radius:12px;padding:14px;background:#fff;}
+.category-rank h4{font-size:13px;margin-bottom:8px;color:#1a1a1a;}
+.category-rank p{font-size:12px;color:var(--muted);margin:4px 0;}
+.top-cortes-list{width:100%;border-collapse:collapse;}
+.top-cortes-list th,.top-cortes-list td{padding:9px 10px;border-bottom:1px solid #eef2f0;text-align:left;font-size:12px;}
+.top-cortes-list th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:#f9fafb;}
+@media(max-width:900px){.bi-grid{grid-template-columns:1fr!important}.performance-row{grid-template-columns:38px 1fr 56px}.category-mini{grid-template-columns:1fr}.top-cortes-list{min-width:640px}}
 </style>
 </head>
 <body>
@@ -208,6 +231,10 @@ select, option{font-family:'Inter',sans-serif;}
     <div class="nav-item" onclick="showPage('cortes')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       Cortes de Carne
+    </div>
+    <div class="nav-item" onclick="showPage('diferenciais')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-7"/><circle cx="7" cy="15" r="1"/><circle cx="11" cy="11" r="1"/><circle cx="14" cy="14" r="1"/><circle cx="19" cy="7" r="1"/></svg>
+      Performance BI
     </div>
     <div class="nav-item" onclick="showPage('ranking')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -349,6 +376,42 @@ select, option{font-family:'Inter',sans-serif;}
         </div>
       </div>
 
+      <!-- DIFERENCIAIS PAGE -->
+      <div class="page" id="page-diferenciais">
+        <div class="page-header">
+          <h2>Performance BI</h2>
+          <p>Indicadores inteligentes, alertas e ranking por categoria para decisão rápida</p>
+        </div>
+
+        <div class="bi-grid" id="bi-highlights"></div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-title">Índice de Performance</div>
+            <div class="chart-sub">Pontuação de 0 a 100 considerando faturamento, peso, transações e ticket médio</div>
+            <div class="performance-list" id="performance-list"></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Ranking por Categoria</div>
+            <div class="chart-sub">Destaque por bovino, aves, suíno e outros</div>
+            <div class="category-mini" id="category-rankings"></div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-title">Top 10 Cortes do Mês</div>
+            <div class="chart-sub">Cortes com maior faturamento no período</div>
+            <div class="table-wrap"><table class="top-cortes-list" id="top-cortes-bi"></table></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Alertas Gerenciais</div>
+            <div class="chart-sub">Pontos de atenção calculados automaticamente</div>
+            <div class="alert-list" id="alert-list"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- RANKING PAGE -->
       <div class="page" id="page-ranking">
         <div class="page-header">
@@ -420,7 +483,7 @@ function showPage(pg){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+pg).classList.add('active');
-  const labels={'dashboard':'Dashboard Geral','operadores':'Análise por Operador','cortes':'Cortes de Carne','ranking':'Ranking de Operadores'};
+  const labels={'dashboard':'Dashboard Geral','operadores':'Análise por Operador','cortes':'Cortes de Carne','diferenciais':'Performance BI','ranking':'Ranking de Operadores'};
   document.getElementById('topbar-title').textContent=labels[pg];
   const nav=[...document.querySelectorAll('.nav-item')].find(n=>n.getAttribute('onclick')?.includes(`'${pg}'`)); if(nav) nav.classList.add('active');
 }
@@ -429,6 +492,7 @@ function initCharts(){
   buildDashboardCharts();
   buildOperadoresPage();
   buildCortesPage();
+  buildDiferenciaisPage();
   buildRankingPage();
 }
 
@@ -589,6 +653,79 @@ function updateCorteChart(){
   const tb=document.getElementById('cut-detail-table');
   if(tb){
     tb.innerHTML='<thead><tr><th>#</th><th>Operador</th><th>Peso kg</th><th>Total R$</th><th>Transações</th></tr></thead><tbody>'+data.map((d,i)=>`<tr><td>${i+1}</td><td><strong>${d.nome||d.op}</strong></td><td>${fmtKg(d.kg)}</td><td><strong>${fmt2(d.v)}</strong></td><td>${Number(d.transacoes||0).toLocaleString('pt-BR')}</td></tr>`).join('')+'</tbody>';
+  }
+}
+
+
+function getCategoryByCutName(nome){
+  const n=(nome||'').toUpperCase();
+  if(n.includes('FRANGO') || n.includes('FGO') || n.includes('ASA') || n.includes('COXA SOBRE') || n.includes('MOELA') || n.includes('CORAÇÃO FRANGO') || n.includes('CORACAO FRANGO')) return 'AVES';
+  if(n.includes('SUINO') || n.includes('SUÍNO') || n.includes('PERNIL') || n.includes('TOSCANA') || n.includes('BISTECA')) return 'SUÍNO';
+  if(n.includes('BOVINO') || n.includes('BOV') || n.includes('ACEM') || n.includes('ALCATRA') || n.includes('CONTRA') || n.includes('COSTELA') || n.includes('PATINHO') || n.includes('COXAO') || n.includes('FRALDINHA')) return 'BOVINO';
+  return 'OUTROS';
+}
+function operatorCategoryTotals(){
+  const out={};
+  Object.entries(DATA.cortes||{}).forEach(([cut, rows])=>{
+    const cat=getCategoryByCutName(cut);
+    rows.forEach(r=>{
+      const key=r.nome||r.op;
+      out[key] ||= {nome:key, short:r.op, BOVINO:0, AVES:0, 'SUÍNO':0, OUTROS:0};
+      out[key][cat] += Number(r.v||0);
+    });
+  });
+  return Object.values(out);
+}
+function buildDiferenciaisPage(){
+  const ops=[...DATA.operators];
+  const totalRs=getTotalRs(), totalKg=getTotalKg(), totalTr=getTotalTrans();
+  const topFat=[...ops].sort((a,b)=>b.total_rs-a.total_rs)[0];
+  const topKg=[...ops].sort((a,b)=>b.total_kg-a.total_kg)[0];
+  const topTr=[...ops].sort((a,b)=>b.transacoes-a.transacoes)[0];
+  const topTicket=[...ops].sort((a,b)=>(b.total_rs/b.transacoes)-(a.total_rs/a.transacoes))[0];
+  const topEff=[...ops].sort((a,b)=>(b.total_rs/b.total_kg)-(a.total_rs/a.total_kg))[0];
+  const highlights=document.getElementById('bi-highlights');
+  if(highlights){
+    highlights.innerHTML=`
+      <div class="bi-card"><div class="bi-label">Maior faturamento</div><div class="bi-value">${topFat.short}</div><div class="bi-sub">${fmt2(topFat.total_rs)} • ${(topFat.total_rs/totalRs*100).toFixed(1)}% do total</div></div>
+      <div class="bi-card"><div class="bi-label">Maior peso</div><div class="bi-value">${topKg.short}</div><div class="bi-sub">${fmtKg(topKg.total_kg)} vendidos</div></div>
+      <div class="bi-card"><div class="bi-label">Mais transações</div><div class="bi-value">${topTr.short}</div><div class="bi-sub">${topTr.transacoes.toLocaleString('pt-BR')} vendas registradas</div></div>
+      <div class="bi-card"><div class="bi-label">Maior ticket médio</div><div class="bi-value">${topTicket.short}</div><div class="bi-sub">${fmt2(topTicket.total_rs/topTicket.transacoes)} por transação</div></div>
+      <div class="bi-card"><div class="bi-label">Melhor R$/kg</div><div class="bi-value">${topEff.short}</div><div class="bi-sub">${fmt2(topEff.total_rs/topEff.total_kg)} por kg</div></div>`;
+  }
+  const maxRs=Math.max(...ops.map(o=>o.total_rs)), maxKg=Math.max(...ops.map(o=>o.total_kg)), maxTr=Math.max(...ops.map(o=>o.transacoes)), maxTicket=Math.max(...ops.map(o=>o.total_rs/o.transacoes));
+  const scored=ops.map(o=>{
+    const score=Math.round(((o.total_rs/maxRs)*0.4 + (o.total_kg/maxKg)*0.25 + (o.transacoes/maxTr)*0.2 + ((o.total_rs/o.transacoes)/maxTicket)*0.15)*100);
+    return {...o, score};
+  }).sort((a,b)=>b.score-a.score).slice(0,8);
+  const perf=document.getElementById('performance-list');
+  if(perf){
+    perf.innerHTML=scored.map((o,i)=>`<div class="performance-row"><div class="score-badge">${i+1}</div><div><strong>${o.short}</strong><div class="score-bar"><div class="score-fill" style="width:${o.score}%"></div></div><small style="color:var(--muted)">${fmt2(o.total_rs)} • ${fmtKg(o.total_kg)} • ${o.transacoes.toLocaleString('pt-BR')} transações</small></div><strong>${o.score} pts</strong></div>`).join('');
+  }
+  const cats=operatorCategoryTotals();
+  const catBox=document.getElementById('category-rankings');
+  if(catBox){
+    catBox.innerHTML=['BOVINO','AVES','SUÍNO','OUTROS'].map(cat=>{
+      const top=[...cats].sort((a,b)=>(b[cat]||0)-(a[cat]||0))[0];
+      return `<div class="category-rank"><h4>${cat}</h4><p><strong>${top?.short||'-'}</strong></p><p>${fmt2(top?.[cat]||0)}</p></div>`;
+    }).join('');
+  }
+  const topCuts=[...(DATA.cutSummary||[])].sort((a,b)=>b.total_rs-a.total_rs).slice(0,10);
+  const topTable=document.getElementById('top-cortes-bi');
+  if(topTable){
+    topTable.innerHTML='<thead><tr><th>#</th><th>Corte</th><th>Categoria</th><th>Total R$</th><th>Peso</th><th>Transações</th></tr></thead><tbody>'+topCuts.map((c,i)=>`<tr><td>${i+1}</td><td><strong>${c.nome.replace(' kg','')}</strong></td><td>${getCategoryByCutName(c.nome)}</td><td><strong>${fmt2(c.total_rs)}</strong></td><td>${fmtKg(c.total_kg)}</td><td>${Number(c.transacoes||0).toLocaleString('pt-BR')}</td></tr>`).join('')+'</tbody>';
+  }
+  const avg=totalRs/ops.length;
+  const below=ops.filter(o=>o.total_rs<avg).length;
+  const lowCuts=(DATA.cutSummary||[]).filter(c=>Number(c.transacoes||0)<=3).length;
+  const bestCut=topCuts[0];
+  const alert=document.getElementById('alert-list');
+  if(alert){
+    alert.innerHTML=`
+      <div class="alert-item">⚠️ ${below} operadores estão abaixo da média de faturamento (${fmt2(avg)}).</div>
+      <div class="alert-item">🥩 Corte líder do mês: <strong>${bestCut?.nome.replace(' kg','')||'-'}</strong> com ${fmt2(bestCut?.total_rs||0)}.</div>
+      <div class="alert-item">📉 ${lowCuts} cortes/produtos tiveram até 3 transações. Vale revisar exposição, preço ou cadastro.</div>
+      <div class="alert-item">📊 Ticket médio geral: <strong>${fmt2(totalRs/totalTr)}</strong> por transação e eficiência média de <strong>${fmt2(totalRs/totalKg)}/kg</strong>.</div>`;
   }
 }
 
