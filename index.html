@@ -808,16 +808,23 @@ function populateCorteSelect(resetSelection=false){
   const current=sel.value;
   const cortes=getFilteredCuts();
   sel.innerHTML='';
+
+  // Opção geral para visualizar todos os cortes da categoria selecionada
+  const allOpt=document.createElement('option');
+  allOpt.value='__ALL__';
+  allOpt.textContent = corteCategoriaAtual==='TODOS' ? 'TODOS OS CORTES — GERAL' : `TODOS OS CORTES — ${corteCategoriaAtual}`;
+  sel.appendChild(allOpt);
+
   cortes.forEach(c=>{
     const opt=document.createElement('option');
     opt.value=c.nome;
     opt.textContent=`${normalizaCorteNome(c.nome)} — ${c.categoria}`;
     sel.appendChild(opt);
   });
-  if(!resetSelection && current && cortes.some(c=>c.nome===current)){
+  if(!resetSelection && current && (current==='__ALL__' || cortes.some(c=>c.nome===current))){
     sel.value=current;
-  }else if(cortes[0]){
-    sel.value=cortes[0].nome;
+  }else{
+    sel.value='__ALL__';
   }
 }
 
@@ -845,7 +852,32 @@ function buildTopCortesChart(){
 }
 
 function updateCorteChart(){
-  const sel=document.getElementById('corte-select')?.value || getFilteredCuts()[0]?.nome || DATA.cutSummary[0]?.nome;
+  const sel=document.getElementById('corte-select')?.value || '__ALL__';
+  const allMode = sel==='__ALL__';
+  const cortesFiltrados=getFilteredCuts();
+
+  if(allMode){
+    const catLabel = corteCategoriaAtual==='TODOS' ? 'Geral' : corteCategoriaAtual;
+    document.getElementById('corte-title').textContent=`Todos os cortes — ${catLabel}`;
+
+    // Gráfico com os maiores cortes da categoria, mantendo a tabela completa abaixo
+    const data=[...cortesFiltrados].sort((a,b)=>b.total_rs-a.total_rs);
+    const chartData=data.slice(0,20);
+
+    if(corteChartInst){corteChartInst.destroy();}
+    corteChartInst=new Chart(document.getElementById('chartCorte'),{
+      type:'bar',
+      data:{labels:chartData.map(d=>normalizaCorteNome(d.nome)),datasets:[{data:chartData.map(d=>d.total_rs),backgroundColor:chartData.map((_,i)=>i===0?'#f5a623':COLORS[i%COLORS.length]),borderRadius:4}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${fmt(ctx.raw)} • ${fmtKg(chartData[ctx.dataIndex].total_kg)} • ${chartData[ctx.dataIndex].transacoes} transações`}}},scales:{x:{ticks:{callback:v=>'R$ '+(v/1000).toFixed(0)+'k'},grid:{color:'#f3f4f6'}},y:{ticks:{font:{size:10}}}}}
+    });
+
+    const tb=document.getElementById('cut-detail-table');
+    if(tb){
+      tb.innerHTML='<thead><tr><th>#</th><th>Corte</th><th>Categoria</th><th>Peso kg</th><th>Total R$</th><th>Transações</th></tr></thead><tbody>'+data.map((d,i)=>`<tr><td>${i+1}</td><td><strong>${normalizaCorteNome(d.nome)}</strong></td><td>${d.categoria}</td><td>${fmtKg(d.total_kg)}</td><td><strong>${fmt2(d.total_rs)}</strong></td><td>${Number(d.transacoes||0).toLocaleString('pt-BR')}</td></tr>`).join('')+'</tbody>';
+    }
+    return;
+  }
+
   document.getElementById('corte-title').textContent=sel.replace(' kg','')+' — Por Operador';
   const data=(DATA.cortes[sel]||[]).sort((a,b)=>b.v-a.v);
   if(corteChartInst){corteChartInst.destroy();}
@@ -865,20 +897,36 @@ function getCategoryByCutName(nome){
   const raw=(nome||'').toUpperCase();
   const n=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 
-  // Regras específicas primeiro para evitar cair na categoria errada
-  if(n.includes('PIZZA FRANGO')) return 'OUTROS';
+  // Regras específicas primeiro para evitar categoria errada
+  if(n.includes('PIZZA FRANGO') || n.includes('PIZZA DE FRANGO')) return 'OUTROS';
 
   // Suínos
-  if(n.includes('SUINO') || n.includes('SUINA') || n.includes('PERNIL') || n.includes('COSTELINHA') || n.includes('PALETA SUINO') || n.includes('TOUCINHO') || n.includes('CHOURICO') || n.includes('JOELHO') || n.includes('PE SUINO') || n.includes('RABO SUINO') || n.includes('BISTECA SUINO')) return 'SUÍNO';
+  // Linguiça mista entra em Suíno para retirar do grupo Outros e deixar o resumo mais correto.
+  if(n.includes('SUINO') || n.includes('SUINA') || n.includes('PERNIL') || n.includes('COSTELINHA') || n.includes('TOUCINHO') || n.includes('CHOURICO') || n.includes('JOELHO') || n.includes('PE SUINO') || n.includes('RABO SUINO') || n.includes('BISTECA SUINO') || n.includes('LING TOSCANA') || n.includes('LING PERNIL') || n.includes('LING CHURRASCO') || n.includes('LING MISTA')) return 'SUÍNO';
 
   // Aves
-  if(n.includes('SOBRECOXA') || n.includes('TULIPA') || n.includes('COXA SOBRE') || n.includes('COXINHA ASA') || n.includes('ASA FRANGO') || n.includes('PEITO FRANGO') || n.includes('FILE FRANGO') || n.includes('FRANGO PASSARINHO') || n.includes('FRANGO INTEIRO') || n.includes('FIGADO FRANGO') || n.includes('MOELA FRANGO') || n.includes('CORACAO FRANGO') || n.includes('FGO') || (n.includes('FRANGO') && !n.includes('PIZZA'))) return 'AVES';
+  if(n.includes('SOBRECOXA') || n.includes('TULIPA') || n.includes('COXA SOBRE') || n.includes('COXINHA ASA') || n.includes('ASA FRANGO') || n.includes('PEITO FRANGO') || n.includes('FILE FRANGO') || n.includes('FRANGO PASSARINHO') || n.includes('FRANGO INTEIRO') || n.includes('FIGADO FRANGO') || n.includes('MOELA FRANGO') || n.includes('CORACAO FRANGO') || n.includes('MEDALHAO FRANGO') || n.includes('PE FRANGO') || n.includes('FGO') || (n.includes('FRANGO') && !n.includes('PIZZA'))) return 'AVES';
 
-  // Bovinos, incluindo picanhas bovinas e carnes com osso
-  if(n.includes('PICANHA') || n.includes('BOVINO') || n.includes('BOV') || n.includes('ACEM') || n.includes('ALCATRA') || n.includes('CONTRA FILE') || n.includes('CONTRA') || n.includes('PATINHO') || n.includes('COXAO') || n.includes('FRALDINHA') || n.includes('PONTA PEITO') || n.includes('C/OSSO') || n.includes('OSSO BUCO') || n.includes('COSTELA') || n.includes('COSTELA RIPA') || n.includes('MOCOTO') || n.includes('BUCHO') || n.includes('CAUDA') || n.includes('CAPA FILE') || n.includes('LAGARTO') || n.includes('PALETA MIOLO')) return 'BOVINO';
+  // Bovinos: picanhas bovinas, contra filé, costelas/ripas e carnes com osso
+  if(n.includes('PICANH') || n.includes('BOVINO') || n.includes('BOV') || n.includes('ACEM') || n.includes('ALCATRA') || n.includes('CONTRA FILE') || n.includes('CONTRA') || n.includes('PATINHO') || n.includes('COXAO') || n.includes('FRALDINHA') || n.includes('PONTA PEITO') || n.includes('C/OSSO') || n.includes('C OSSO') || n.includes('OSSO') || n.includes('COSTELA') || n.includes('RIPA') || n.includes('MOCOTO') || n.includes('BUCHO') || n.includes('CAUDA') || n.includes('CAPA FILE') || n.includes('LAGARTO') || n.includes('PALETA MIOLO') || n.includes('ARANHA') || n.includes('FILE MIGNON') || n.includes('BISTECA BOVINO')) return 'BOVINO';
 
   return 'OUTROS';
 }
+function normalizeCategoriesAndTotals(){
+  const acc={};
+  (DATA.cutSummary||[]).forEach(c=>{
+    c.categoria=getCategoryByCutName(c.nome);
+    acc[c.categoria] ||= {categoria:c.categoria,total_rs:0,total_kg:0,transacoes:0,cortes:0};
+    acc[c.categoria].total_rs += Number(c.total_rs||0);
+    acc[c.categoria].total_kg += Number(c.total_kg||0);
+    acc[c.categoria].transacoes += Number(c.transacoes||0);
+    acc[c.categoria].cortes += 1;
+  });
+  const ordem={'AVES':1,'BOVINO':2,'SUÍNO':3,'OUTROS':4};
+  DATA.catSummary=Object.values(acc).sort((a,b)=>(ordem[a.categoria]||99)-(ordem[b.categoria]||99));
+}
+normalizeCategoriesAndTotals();
+
 function operatorCategoryTotals(){
   const out={};
   Object.entries(DATA.cortes||{}).forEach(([cut, rows])=>{
